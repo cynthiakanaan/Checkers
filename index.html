@@ -6,7 +6,11 @@
 <title>Next Checkers Move — Calculator</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
+/* ═══════════════════════════════════════
+   THEME SYSTEM
+═══════════════════════════════════════ */
 :root {
+  /* Dark theme (default) */
   --bg: #111;
   --surface: #1c1c1c;
   --panel: #1f1f1f;
@@ -16,78 +20,193 @@
   --gold-dim: #8a6a28;
   --cream: #f0e8d8;
   --cream-dim: #a89878;
+  --text-primary: #f0e8d8;
+  --text-secondary: #a89878;
+  --banner-bg: #252525;
+  --input-bg: #252525;
+  --hover-bg: #2e2e2e;
+  --overlay-bg: rgba(0,0,0,.85);
+
+  /* Piece defaults */
   --red-piece: #cc2200;
   --red-shine: #ff4422;
   --red-dark: #881100;
   --blk-piece: #282828;
   --blk-shine: #505050;
-  --sq-red: #c0392b;
-  --sq-black: #1a1a1a;
-  --sq-red-hover: #d44e40;
-  --sq-black-hover: #2e2e2e;
-  --sq-size: 70px;
+
+  /* Board defaults */
+  --sq-light: #c0392b;
+  --sq-dark: #1a1a1a;
+  --sq-light-hover: #d44e40;
+  --sq-dark-hover: #2e2e2e;
+
+  --sq-size: min(70px, calc((100vw - 340px - 80px) / 8));
   --board-size: calc(var(--sq-size) * 8);
 }
+
+/* Light theme */
+html.light {
+  --bg: #f5f0e8;
+  --surface: #fff;
+  --panel: #fff;
+  --border: #d4c8b0;
+  --gold: #9a7520;
+  --gold-light: #b8922e;
+  --gold-dim: #7a6018;
+  --cream: #2a2418;
+  --cream-dim: #6a5a40;
+  --text-primary: #2a2418;
+  --text-secondary: #6a5a40;
+  --banner-bg: #efe8d8;
+  --input-bg: #efe8d8;
+  --hover-bg: #e8e0d0;
+  --overlay-bg: rgba(255,255,255,.9);
+}
+html.light .piece.black {
+  box-shadow:0 5px 14px rgba(0,0,0,.3), inset 0 2px 5px rgba(255,255,255,.15), inset 0 -3px 5px rgba(0,0,0,.3);
+}
+html.light .panel {
+  box-shadow:0 2px 16px rgba(0,0,0,.08);
+}
+html.light .btn-calc {
+  box-shadow:0 3px 14px rgba(154,117,32,.25);
+}
+html.light #boardContainer {
+  border-color:#a89878;
+  box-shadow:0 0 0 1px #c0b090, 0 8px 30px rgba(0,0,0,.15);
+}
+html.light footer { color:#b0a080; }
+
+/* Board theme presets */
+.board-theme-classic { --sq-light: #c0392b; --sq-dark: #1a1a1a; }
+.board-theme-wood    { --sq-light: #c49a6c; --sq-dark: #6b3a2a; }
+.board-theme-ocean   { --sq-light: #4a90a4; --sq-dark: #1a3a4a; }
+.board-theme-forest  { --sq-light: #5a9a5a; --sq-dark: #1a3a1a; }
+.board-theme-royal   { --sq-light: #8a5acc; --sq-dark: #2a1a4a; }
+.board-theme-marble  { --sq-light: #d8d0c0; --sq-dark: #4a4a4a; }
+
+/* Piece style presets */
+.piece-style-classic .piece.red {
+  background:radial-gradient(circle at 36% 33%, var(--red-shine) 0%, var(--red-piece) 42%, var(--red-dark) 100%);
+}
+.piece-style-flat .piece.red {
+  background: var(--red-piece);
+  box-shadow: 0 3px 8px rgba(0,0,0,.4);
+}
+.piece-style-flat .piece.black {
+  background: var(--blk-piece);
+  box-shadow: 0 3px 8px rgba(0,0,0,.4);
+}
+.piece-style-neon .piece.red {
+  background:radial-gradient(circle at 36% 33%, #ff6644 0%, #ee3311 42%, #aa1100 100%);
+  box-shadow: 0 0 16px rgba(255,50,20,.5), inset 0 2px 5px rgba(255,255,255,.2);
+}
+.piece-style-neon .piece.black {
+  background:radial-gradient(circle at 36% 33%, #8888ff 0%, #4444cc 55%, #2222aa 100%);
+  box-shadow: 0 0 16px rgba(80,80,255,.4), inset 0 2px 5px rgba(255,255,255,.1);
+}
+
 * { box-sizing: border-box; margin:0; padding:0; }
 body {
   background: var(--bg);
-  color: var(--cream);
+  color: var(--text-primary);
   font-family: 'DM Sans', sans-serif;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 18px 12px 40px;
+  padding: 18px 16px 40px;
   background-image:
     radial-gradient(ellipse at 15% 5%, rgba(192,57,43,0.08) 0%, transparent 45%),
     radial-gradient(ellipse at 85% 95%, rgba(212,169,74,0.05) 0%, transparent 45%);
+  transition: background .3s, color .3s;
+}
+html.light body {
+  background-image:
+    radial-gradient(ellipse at 15% 5%, rgba(192,57,43,0.04) 0%, transparent 45%),
+    radial-gradient(ellipse at 85% 95%, rgba(212,169,74,0.03) 0%, transparent 45%);
 }
 
-/* HEADER */
-header { text-align: center; margin-bottom: 20px; }
-h1 { font-family:'Playfair Display',serif; font-size:clamp(1.6rem,3.5vw,2.4rem); color:var(--cream); letter-spacing:.02em; }
+/* ═══ HEADER ═══ */
+header { text-align: center; margin-bottom: 16px; display:flex; align-items:center; justify-content:center; gap:16px; flex-wrap:wrap; }
+.header-main { display:flex; flex-direction:column; align-items:center; }
+h1 { font-family:'Playfair Display',serif; font-size:clamp(1.5rem,3.5vw,2.2rem); color:var(--text-primary); letter-spacing:.02em; }
 h1 em { color:#e74c3c; font-style:normal; }
-.sub { font-size:.8rem; color:var(--cream-dim); letter-spacing:.12em; text-transform:uppercase; margin-top:4px; }
+.sub { font-size:.75rem; color:var(--text-secondary); letter-spacing:.12em; text-transform:uppercase; margin-top:3px; }
 
-/* BANNER */
+/* Header icon buttons */
+.header-actions { display:flex; gap:8px; align-items:center; }
+.icon-btn {
+  width:38px; height:38px; border-radius:8px; border:1px solid var(--border);
+  background:var(--panel); color:var(--text-secondary); cursor:pointer;
+  display:flex; align-items:center; justify-content:center; font-size:1.1rem;
+  transition:all .15s; position:relative;
+}
+.icon-btn:hover { border-color:var(--gold-dim); color:var(--gold-light); background:var(--hover-bg); }
+.icon-btn .tooltip {
+  position:absolute; bottom:calc(100% + 6px); left:50%; transform:translateX(-50%);
+  background:#222; color:#eee; font-size:.68rem; padding:4px 8px; border-radius:4px;
+  white-space:nowrap; opacity:0; pointer-events:none; transition:opacity .15s;
+}
+html.light .icon-btn .tooltip { background:#444; }
+.icon-btn:hover .tooltip { opacity:1; }
+
+/* Theme dropdown */
+.theme-dropdown {
+  position:absolute; top:calc(100% + 6px); right:0; z-index:100;
+  background:var(--panel); border:1px solid var(--border); border-radius:8px;
+  padding:10px; min-width:180px; display:none; box-shadow:0 8px 30px rgba(0,0,0,.4);
+}
+.theme-dropdown.open { display:block; }
+.theme-dropdown label {
+  display:flex; align-items:center; gap:8px; padding:6px 8px; border-radius:4px;
+  cursor:pointer; font-size:.82rem; color:var(--text-secondary); transition:background .12s;
+}
+.theme-dropdown label:hover { background:var(--hover-bg); color:var(--text-primary); }
+.theme-dropdown label input { accent-color:var(--gold); }
+.theme-sep { height:1px; background:var(--border); margin:6px 0; }
+
+/* ═══ BANNER ═══ */
 #resultBanner {
-  width:100%; max-width:640px; min-height:52px;
-  background:#252525; border:1px solid var(--border); border-radius:8px;
+  width:100%; max-width:720px; min-height:48px;
+  background:var(--banner-bg); border:1px solid var(--border); border-radius:8px;
   display:flex; flex-direction:column; justify-content:center;
   padding:10px 18px; gap:5px;
-  margin-bottom:16px; font-size:.9rem; color:var(--cream-dim); font-style:italic;
+  margin-bottom:14px; font-size:.88rem; color:var(--text-secondary); font-style:italic;
   transition: border-color .2s, background .2s;
 }
-#resultBanner.active    { border-color:var(--gold-dim); background:#252218; font-style:normal; color:var(--cream); }
+#resultBanner.active { border-color:var(--gold-dim); background:rgba(37,34,24,.9); font-style:normal; color:var(--text-primary); }
+html.light #resultBanner.active { background:rgba(239,232,216,.95); }
 #resultBanner.banner-alt { border-color:#4a6a9a; background:#1c2230; }
+html.light #resultBanner.banner-alt { background:#e0e8f4; }
 .banner-row { display:flex; align-items:center; flex-wrap:wrap; gap:8px; }
-.banner-sub { font-size:.78rem; color:var(--cream-dim); margin-top:1px; }
+.banner-sub { font-size:.76rem; color:var(--text-secondary); margin-top:1px; }
 #resultBanner.banner-alt .banner-sub { color:#7a9acc; }
-.banner-vs  { font-size:.78rem; color:#7a9acc; }
+.banner-vs  { font-size:.76rem; color:#7a9acc; }
 .banner-vs strong { color:#aac4ee; }
-.banner-score-val { font-weight:700; font-size:.92rem; padding:2px 7px; border-radius:4px; }
+.banner-score-val { font-weight:700; font-size:.9rem; padding:2px 7px; border-radius:4px; }
 .best-score { background:rgba(60,180,60,.18); color:#6ee87a; border:1px solid rgba(60,180,60,.3); }
 .alt-score  { background:rgba(80,140,220,.18); color:#90bcee; border:1px solid rgba(80,140,220,.3); }
-.bl  { color:var(--cream-dim); white-space:nowrap; font-size:.82rem; }
-.bm  { background:#fff; color:#111; font-weight:700; font-size:.88rem; padding:3px 10px; border-radius:4px; letter-spacing:.05em; }
+.bl  { color:var(--text-secondary); white-space:nowrap; font-size:.8rem; }
+.bm  { background:#fff; color:#111; font-weight:700; font-size:.86rem; padding:3px 10px; border-radius:4px; letter-spacing:.05em; }
 .bm-alt { background:#2a3f5f; color:#aac4ee; border:1px solid #4a6a9a; }
-.bs  { background:#222; color:#fff; font-weight:600; font-size:.88rem; padding:3px 10px; border-radius:4px; }
-.bsc { color:var(--cream-dim); font-size:.8rem; }
+.bs  { background:#222; color:#fff; font-weight:600; font-size:.86rem; padding:3px 10px; border-radius:4px; }
+.bsc { color:var(--text-secondary); font-size:.78rem; }
 .spin-sm { width:16px;height:16px;border:2px solid var(--border);border-top-color:var(--gold);border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0; }
 @keyframes spin{to{transform:rotate(360deg)}}
 
-/* LAYOUT */
-.main { display:flex; gap:20px; align-items:flex-start; flex-wrap:wrap; justify-content:center; width:100%; max-width:1080px; }
-.board-col { display:flex; flex-direction:column; align-items:center; gap:0; user-select:none; }
+/* ═══ LAYOUT ═══ */
+.main { display:flex; gap:20px; align-items:flex-start; justify-content:center; width:100%; max-width:1200px; }
+.board-col { display:flex; flex-direction:column; align-items:center; gap:0; user-select:none; flex-shrink:0; }
 .board-row-wrap { display:flex; align-items:flex-start; }
 
-/* COORDS */
-.rank-labels { display:flex; flex-direction:column; width:22px; flex-shrink:0; }
-.rank-lbl { height:var(--sq-size); display:flex; align-items:center; justify-content:center; font-size:.7rem; color:var(--cream-dim); font-family:'Playfair Display',serif; }
-.file-labels { display:flex; margin-left:22px; }
-.file-lbl { width:var(--sq-size); text-align:center; font-size:.7rem; color:var(--cream-dim); font-family:'Playfair Display',serif; padding-top:4px; }
+/* Coords */
+.rank-labels { display:flex; flex-direction:column; width:20px; flex-shrink:0; }
+.rank-lbl { height:var(--sq-size); display:flex; align-items:center; justify-content:center; font-size:.68rem; color:var(--text-secondary); font-family:'Playfair Display',serif; }
+.file-labels { display:flex; margin-left:20px; }
+.file-lbl { width:var(--sq-size); text-align:center; font-size:.68rem; color:var(--text-secondary); font-family:'Playfair Display',serif; padding-top:3px; }
 
-/* BOARD */
+/* ═══ BOARD ═══ */
 #boardContainer {
   position:relative;
   width:var(--board-size); height:var(--board-size);
@@ -106,27 +225,23 @@ h1 em { color:#e74c3c; font-style:normal; }
   display:flex; align-items:center; justify-content:center;
   position:relative;
 }
-.sq.sq-red   { background:var(--sq-red); }
-.sq.sq-black { background:var(--sq-black); }
+.sq.sq-light { background:var(--sq-light); }
+.sq.sq-dark  { background:var(--sq-dark); }
 .sq.playable { cursor:pointer; }
-.sq.sq-red.playable:hover   { background:var(--sq-red-hover); }
-.sq.sq-black.playable:hover { background:var(--sq-black-hover); }
+.sq.sq-light.playable:hover { filter:brightness(1.12); }
+.sq.sq-dark.playable:hover  { filter:brightness(1.25); }
 
-/* highlight overlay */
-.sq-hl {
-  position:absolute; inset:0; pointer-events:none; z-index:2;
-}
+.sq-hl { position:absolute; inset:0; pointer-events:none; z-index:2; }
 .hl-from .sq-hl { background:rgba(255,220,50,.45); }
 .hl-to   .sq-hl { background:rgba(60,210,90,.45); }
 .hl-cap  .sq-hl { background:rgba(255,60,60,.5); }
 .drag-over .sq-hl { background:rgba(255,220,50,.18); outline:3px solid var(--gold-light); outline-offset:-3px; }
 
-/* SVG */
 #arrowSvg { position:absolute; inset:0; width:100%; height:100%; pointer-events:none; z-index:10; }
 
-/* PIECES */
+/* ═══ PIECES ═══ */
 .piece {
-  width:56px; height:56px; border-radius:50%;
+  width:calc(var(--sq-size) * 0.78); height:calc(var(--sq-size) * 0.78); border-radius:50%;
   position:relative; cursor:grab; transition:transform .1s;
   z-index:5; flex-shrink:0;
 }
@@ -143,40 +258,50 @@ h1 em { color:#e74c3c; font-style:normal; }
   border:2.5px solid #0a0a0a;
 }
 .piece::before {
-  content:''; position:absolute; top:8px;left:8px;right:8px;bottom:8px;
+  content:''; position:absolute; top:14%;left:14%;right:14%;bottom:14%;
   border-radius:50%; border:1.5px solid rgba(255,255,255,.12); pointer-events:none;
 }
 .piece.king::after {
   content:'♛'; position:absolute; top:50%;left:50%;
   transform:translate(-50%,-50%);
-  font-size:22px; color:rgba(255,215,80,.95);
+  font-size:calc(var(--sq-size) * 0.3); color:rgba(255,215,80,.95);
   text-shadow:0 1px 4px rgba(0,0,0,.9); pointer-events:none; line-height:1;
 }
 
-/* PANEL */
+/* Animated piece (for move animation) */
+.piece-anim {
+  position:absolute; z-index:50; pointer-events:none;
+  transition: top .35s cubic-bezier(.4,0,.2,1), left .35s cubic-bezier(.4,0,.2,1);
+}
+
+/* ═══ PANEL ═══ */
 .panel {
   background:var(--panel); border:1px solid var(--border); border-radius:8px;
-  padding:18px 16px; width:272px; flex-shrink:0;
-  display:flex; flex-direction:column; gap:16px;
+  padding:16px 14px; width:280px; flex-shrink:0;
+  display:flex; flex-direction:column; gap:14px;
   box-shadow:0 4px 24px rgba(0,0,0,.5);
+  max-height:calc(100vh - 80px); overflow-y:auto;
+  scrollbar-width:thin; scrollbar-color:var(--border) transparent;
 }
-.stitle { font-size:.68rem; letter-spacing:.18em; text-transform:uppercase; color:var(--gold-dim); border-bottom:1px solid var(--border); padding-bottom:6px; margin-bottom:8px; font-weight:600; }
+.panel::-webkit-scrollbar { width:5px; }
+.panel::-webkit-scrollbar-thumb { background:var(--border); border-radius:3px; }
+.stitle { font-size:.65rem; letter-spacing:.18em; text-transform:uppercase; color:var(--gold-dim); border-bottom:1px solid var(--border); padding-bottom:5px; margin-bottom:6px; font-weight:600; }
 
 /* Turn */
 .turn-row { display:flex; gap:8px; }
-.turn-btn { flex:1; padding:9px 6px; border-radius:5px; border:2px solid var(--border); background:#252525; color:var(--cream-dim); font-family:'DM Sans',sans-serif; font-size:.88rem; font-weight:500; cursor:pointer; transition:all .15s; display:flex; align-items:center; justify-content:center; gap:7px; }
-.turn-btn:hover { border-color:#555; color:var(--cream); }
+.turn-btn { flex:1; padding:8px 6px; border-radius:5px; border:2px solid var(--border); background:var(--input-bg); color:var(--text-secondary); font-family:'DM Sans',sans-serif; font-size:.85rem; font-weight:500; cursor:pointer; transition:all .15s; display:flex; align-items:center; justify-content:center; gap:6px; }
+.turn-btn:hover { border-color:#555; color:var(--text-primary); }
 .turn-btn.on-red   { border-color:#cc3322; background:rgba(192,57,43,.2); color:#ff8878; }
-.turn-btn.on-black { border-color:#666; background:rgba(80,80,80,.25); color:var(--cream); }
-.dot { width:13px;height:13px;border-radius:50%;flex-shrink:0; }
+.turn-btn.on-black { border-color:#666; background:rgba(80,80,80,.25); color:var(--text-primary); }
+.dot { width:12px;height:12px;border-radius:50%;flex-shrink:0; }
 .dot.red   { background:var(--red-piece); }
 .dot.black { background:#666; border:1px solid #aaa; }
 
 /* Palette */
-.pal-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:6px; }
-.pal-item { display:flex; flex-direction:column; align-items:center; gap:3px; }
+.pal-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:5px; }
+.pal-item { display:flex; flex-direction:column; align-items:center; gap:2px; }
 .pal-piece {
-  width:44px; height:44px; border-radius:50%; cursor:pointer;
+  width:40px; height:40px; border-radius:50%; cursor:pointer;
   position:relative; border:3px solid transparent;
   transition:transform .12s, border-color .12s; flex-shrink:0;
 }
@@ -184,116 +309,53 @@ h1 em { color:#e74c3c; font-style:normal; }
 .pal-piece.sel { border-color:var(--gold-light)!important; box-shadow:0 0 10px rgba(240,201,106,.4); }
 .pal-piece.red { background:radial-gradient(circle at 36% 33%, var(--red-shine) 0%, var(--red-piece) 45%, var(--red-dark) 100%); border-color:#991a0a; }
 .pal-piece.black { background:radial-gradient(circle at 36% 33%, var(--blk-shine) 0%, var(--blk-piece) 55%, #0e0e0e 100%); border-color:#0a0a0a; }
-.pal-piece.king::after { content:'♛'; position:absolute; top:50%;left:50%; transform:translate(-50%,-50%); font-size:17px; color:rgba(255,215,80,.95); text-shadow:0 1px 3px rgba(0,0,0,.9); pointer-events:none; }
-.pal-erase { width:44px;height:44px;border-radius:6px;border:2px dashed var(--border);background:#252525;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1.1rem;color:var(--cream-dim);transition:all .13s; }
-.pal-erase:hover { border-color:#777;color:var(--cream); }
+.pal-piece.king::after { content:'♛'; position:absolute; top:50%;left:50%; transform:translate(-50%,-50%); font-size:15px; color:rgba(255,215,80,.95); text-shadow:0 1px 3px rgba(0,0,0,.9); pointer-events:none; }
+.pal-erase { width:40px;height:40px;border-radius:6px;border:2px dashed var(--border);background:var(--input-bg);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1rem;color:var(--text-secondary);transition:all .13s; }
+.pal-erase:hover { border-color:#777;color:var(--text-primary); }
 .pal-erase.sel { border-color:var(--gold-light)!important;color:var(--gold-light); }
-.pal-lbl { font-size:.6rem; color:var(--cream-dim); text-align:center; }
-.edit-hint { font-size:.74rem; color:var(--cream-dim); line-height:1.55; }
+.pal-lbl { font-size:.58rem; color:var(--text-secondary); text-align:center; }
+.edit-hint { font-size:.72rem; color:var(--text-secondary); line-height:1.5; }
 
 /* Counts */
-.counts { display:flex; justify-content:space-between; background:#252525; border-radius:5px; padding:8px 12px; border:1px solid var(--border); }
-.cnt-item { display:flex; align-items:center; gap:6px; font-size:.85rem; color:var(--cream-dim); }
+.counts { display:flex; justify-content:space-between; background:var(--input-bg); border-radius:5px; padding:7px 10px; border:1px solid var(--border); }
+.cnt-item { display:flex; align-items:center; gap:5px; font-size:.82rem; color:var(--text-secondary); }
 
 /* Depth */
-.depth-row { display:flex; align-items:center; justify-content:space-between; font-size:.88rem; color:var(--cream-dim); }
-.depth-sel { background:#252525; border:1px solid var(--border); color:var(--cream); font-family:'DM Sans',sans-serif; font-size:.84rem; padding:5px 8px; border-radius:4px; cursor:pointer; width:115px; }
+.depth-row { display:flex; align-items:center; justify-content:space-between; font-size:.85rem; color:var(--text-secondary); }
+.depth-sel { background:var(--input-bg); border:1px solid var(--border); color:var(--text-primary); font-family:'DM Sans',sans-serif; font-size:.82rem; padding:5px 8px; border-radius:4px; cursor:pointer; width:115px; }
 .depth-sel:focus { outline:1px solid var(--gold-dim); }
 
+/* Force jumps toggle */
+.toggle-row { display:flex; align-items:center; justify-content:space-between; font-size:.82rem; color:var(--text-secondary); }
+.toggle-switch {
+  width:40px; height:22px; border-radius:11px; background:var(--border);
+  position:relative; cursor:pointer; transition:background .2s; flex-shrink:0;
+}
+.toggle-switch.on { background:var(--gold); }
+.toggle-switch::after {
+  content:''; position:absolute; top:2px; left:2px;
+  width:18px; height:18px; border-radius:50%; background:#fff;
+  transition:transform .2s; box-shadow:0 1px 3px rgba(0,0,0,.3);
+}
+.toggle-switch.on::after { transform:translateX(18px); }
+
 /* Buttons */
-.btn { border:none; border-radius:5px; font-family:'DM Sans',sans-serif; font-size:.9rem; font-weight:600; cursor:pointer; padding:10px 12px; transition:all .15s; width:100%; letter-spacing:.03em; }
-.btn-calc { background:linear-gradient(135deg,#b88f38,var(--gold-light),#b88f38); background-size:200%; color:#111; box-shadow:0 3px 14px rgba(212,169,74,.35); font-size:.95rem; }
+.btn { border:none; border-radius:5px; font-family:'DM Sans',sans-serif; font-size:.88rem; font-weight:600; cursor:pointer; padding:9px 10px; transition:all .15s; width:100%; letter-spacing:.03em; }
+.btn-calc { background:linear-gradient(135deg,#b88f38,var(--gold-light),#b88f38); background-size:200%; color:#111; box-shadow:0 3px 14px rgba(212,169,74,.35); font-size:.92rem; }
 .btn-calc:hover { background-position:right; box-shadow:0 5px 20px rgba(212,169,74,.5); transform:translateY(-1px); }
 .btn-calc:disabled { opacity:.45; cursor:not-allowed; transform:none; }
-.btn-sec { background:#252525; color:var(--cream-dim); border:1px solid var(--border); }
-.btn-sec:hover { border-color:#666; color:var(--cream); }
-.btn-row { display:flex; gap:7px; }
+.btn-sec { background:var(--input-bg); color:var(--text-secondary); border:1px solid var(--border); }
+.btn-sec:hover { border-color:#666; color:var(--text-primary); }
+.btn-row { display:flex; gap:6px; }
 .btn-row .btn { flex:1; }
 
-/* Execute Move button */
-.exec-wrap { display:flex; flex-direction:column; gap:6px; }
-.btn-exec {
-  background:#1a2e1a; color:#6ee87a; border:2px solid #2d5a2d;
-  font-size:.95rem; font-weight:700; letter-spacing:.04em;
-  opacity:.45; cursor:not-allowed; transition:all .2s;
-}
-.btn-exec:not(:disabled) { opacity:1; cursor:pointer; }
-.btn-exec.exec-ready {
-  background:linear-gradient(135deg,#1a3a1a,#2d7a2d,#1a3a1a);
-  background-size:200%; border-color:#4aaa4a; color:#afffb0;
-  box-shadow:0 3px 16px rgba(74,200,74,.3); opacity:1; cursor:pointer;
-}
-.btn-exec.exec-ready:hover {
-  background-position:right; box-shadow:0 5px 22px rgba(74,200,74,.45);
-  transform:translateY(-1px);
-}
-.btn-exec.exec-ready:active { transform:translateY(0); }
-.exec-info {
-  font-size:.78rem; color:var(--cream-dim); text-align:center;
-  line-height:1.45; min-height:18px; padding:0 2px;
-}
-.exec-info strong { color:var(--gold-light); }
-
-/* Candidates */
-.cands { display:flex; flex-direction:column; gap:3px; margin-top:4px; }
-.cand {
-  display:flex; align-items:center; gap:8px;
-  padding:7px 10px; border-radius:5px;
-  background:#252525; cursor:pointer;
-  transition:background .12s, border-color .12s;
-  font-size:.86rem; border-left:3px solid transparent;
-  border: 1px solid transparent;
-}
-.cand:hover { background:#2e2e2e; border-color:#444; }
-.cand.best  { border-left:3px solid var(--gold); background:#2a2518; }
-.cand.selected-cand {
-  background:#1e2a1e !important;
-  border:1px solid #3a6a3a !important;
-  border-left:3px solid #4aaa4a !important;
-  box-shadow: 0 0 8px rgba(74,170,74,.15);
-}
-.cand-rank {
-  font-size:.65rem; color:var(--cream-dim); min-width:20px;
-  text-align:center; font-family:'Playfair Display',serif;
-}
-.best-rank { color:var(--gold-light); font-size:.8rem; }
-.cand-mv { color:var(--cream); font-weight:600; flex:1; }
-.cand-sc { font-size:.82rem; font-weight:600; padding:2px 6px; border-radius:3px; }
-.cand.best .cand-sc,
-.cand.selected-cand .cand-sc { background:rgba(60,180,60,.15); color:#6ee87a; }
-.cand:not(.best):not(.selected-cand) .cand-sc { color:var(--gold-dim); }
-
-/* Legend */
-.legend { font-size:.8rem; color:var(--cream-dim); display:flex; flex-direction:column; gap:5px; }
-.leg-row { display:flex; align-items:center; gap:8px; }
-.leg-sw { width:16px;height:16px;border-radius:3px;flex-shrink:0; }
-.sw-from { background:rgba(255,220,50,.5); border:1px solid rgba(255,220,50,.7); }
-.sw-to   { background:rgba(60,210,90,.5);  border:1px solid rgba(60,210,90,.7); }
-.sw-cap  { background:rgba(255,60,60,.5);  border:1px solid rgba(255,60,60,.7); }
-
-#statusBar { font-size:.77rem; color:var(--cream-dim); text-align:center; min-height:17px; margin-top:4px; letter-spacing:.04em; }
-
-footer { margin-top:28px; font-size:.73rem; color:#555; letter-spacing:.06em; text-align:center; }
-
-.drag-ghost { position:fixed; pointer-events:none; z-index:1000; opacity:.85; transform:translate(-50%,-50%) scale(1.12); }
-
-/* View labels */
-.view-label {
-  display:flex; align-items:center; gap:7px;
-  font-size:.78rem; color:var(--cream-dim);
-  padding:5px 2px; letter-spacing:.06em;
-  text-transform:uppercase; font-weight:500;
-  width:var(--board-size);
-}
-.view-label.bottom { justify-content:flex-end; }
-
-/* Execute move button */
+/* Execute move */
 .exec-wrap { display:flex; flex-direction:column; gap:5px; }
 .btn-exec {
-  width:100%; padding:11px 12px; border-radius:5px;
+  width:100%; padding:10px 10px; border-radius:5px;
   border:2px solid var(--border); background:#1a2a1a;
   color:#4a7a4a; font-family:'DM Sans',sans-serif;
-  font-size:.95rem; font-weight:600; cursor:not-allowed;
+  font-size:.92rem; font-weight:600; cursor:not-allowed;
   transition:all .2s; letter-spacing:.03em;
 }
 .btn-exec:disabled { opacity:.4; cursor:not-allowed; }
@@ -305,88 +367,250 @@ footer { margin-top:28px; font-size:.73rem; color:#555; letter-spacing:.06em; te
 }
 .btn-exec.exec-ready:hover {
   background:#163a16; box-shadow:0 0 22px rgba(34,197,94,.4);
-  transform:translateY(-1px);
-  animation:none;
+  transform:translateY(-1px); animation:none;
 }
-.btn-exec.exec-ready:active { transform:translateY(0); }
 @keyframes exec-pulse {
   0%,100%{ box-shadow:0 0 10px rgba(34,197,94,.2); }
   50%    { box-shadow:0 0 22px rgba(34,197,94,.45); }
 }
 .exec-info {
-  font-size:.78rem; color:#86efac; min-height:16px;
+  font-size:.76rem; color:#86efac; min-height:16px;
   padding:0 2px; line-height:1.4;
 }
 .exec-info strong { color:#4ade80; }
-  flex:1; padding:9px 6px; border-radius:5px;
-  border:2px solid var(--border); background:#252525;
-  color:var(--cream-dim); font-family:'DM Sans',sans-serif;
-  font-size:.82rem; font-weight:500; cursor:pointer;
-  transition:all .15s; display:flex; align-items:center;
-  justify-content:center; gap:6px;
-}
-.btn-perspective:hover { border-color:#555; color:var(--cream); }
-.btn-perspective.active-persp { border-color:var(--gold-dim); background:#252218; color:var(--gold-light); }
 
-/* Orientation 2×2 grid */
-.orient-grid {
-  display:grid; grid-template-columns:1fr 1fr; gap:7px;
-}
+/* Orientation */
+.orient-grid { display:grid; grid-template-columns:1fr 1fr; gap:6px; }
 .orient-btn {
-  background:#252525; border:2px solid var(--border);
-  border-radius:6px; padding:8px 6px;
+  background:var(--input-bg); border:2px solid var(--border);
+  border-radius:6px; padding:7px 5px;
   cursor:pointer; transition:all .15s;
-  display:flex; flex-direction:column; align-items:center; gap:4px;
-  color:var(--cream-dim);
+  display:flex; flex-direction:column; align-items:center; gap:3px;
+  color:var(--text-secondary);
 }
-.orient-btn:hover { border-color:#555; background:#2d2d2d; }
-.orient-btn.flip-active { border-color:var(--gold); background:#252218; box-shadow:0 0 8px rgba(212,169,74,.2); }
+.orient-btn:hover { border-color:#555; background:var(--hover-bg); }
+.orient-btn.flip-active { border-color:var(--gold); background:rgba(37,34,24,.7); box-shadow:0 0 8px rgba(212,169,74,.2); }
+html.light .orient-btn.flip-active { background:rgba(154,117,32,.08); }
 .ob-mini { display:flex; flex-direction:column; gap:2px; align-items:center; }
 .ob-row  { display:flex; gap:3px; }
-.ob-dot  { width:9px; height:9px; border-radius:50%; }
+.ob-dot  { width:8px; height:8px; border-radius:50%; }
 .ob-dot.red   { background:var(--red-piece); }
 .ob-dot.black { background:#666; }
-.ob-mid  { font-size:.55rem; color:var(--border); letter-spacing:2px; }
-.ob-label { font-size:.62rem; color:inherit; letter-spacing:.04em; white-space:nowrap; }
+.ob-mid  { font-size:.5rem; color:var(--border); letter-spacing:2px; }
+.ob-label { font-size:.6rem; color:inherit; letter-spacing:.04em; white-space:nowrap; }
 .orient-btn.flip-active .ob-label { color:var(--gold-light); }
-
-/* Flip toggle buttons */
 .btn-flip {
-  flex:1; padding:8px 6px; border-radius:5px;
-  border:2px solid var(--border); background:#252525;
-  color:var(--cream-dim); font-family:'DM Sans',sans-serif;
-  font-size:.82rem; font-weight:500; cursor:pointer;
-  transition:all .15s;
+  flex:1; padding:7px 5px; border-radius:5px;
+  border:2px solid var(--border); background:var(--input-bg);
+  color:var(--text-secondary); font-family:'DM Sans',sans-serif;
+  font-size:.8rem; font-weight:500; cursor:pointer; transition:all .15s;
 }
-.btn-flip:hover { border-color:#666; color:var(--cream); background:#2d2d2d; }
-.btn-flip.flip-active { border-color:var(--gold-dim); background:#252218; color:var(--gold-light); }
+.btn-flip:hover { border-color:#666; color:var(--text-primary); }
+.btn-flip.flip-active { border-color:var(--gold-dim); background:rgba(37,34,24,.7); color:var(--gold-light); }
 
-@media(max-width:680px){
-  :root{--sq-size:42px;}
-  .piece{width:34px;height:34px;}
-  .piece.king::after,.pal-piece.king::after{font-size:15px;}
-  .panel{width:100%;max-width:360px;}
-  .pal-piece,.pal-erase{width:36px;height:36px;}
+/* Candidates */
+.cands { display:flex; flex-direction:column; gap:3px; margin-top:4px; }
+.cand {
+  display:flex; align-items:center; gap:7px;
+  padding:6px 9px; border-radius:5px;
+  background:var(--input-bg); cursor:pointer;
+  transition:background .12s, border-color .12s;
+  font-size:.84rem; border-left:3px solid transparent;
+  border: 1px solid transparent;
+}
+.cand:hover { background:var(--hover-bg); border-color:#444; }
+.cand.best  { border-left:3px solid var(--gold); background:rgba(42,37,24,.7); }
+html.light .cand.best { background:rgba(154,117,32,.06); }
+.cand.selected-cand {
+  background:#1e2a1e !important;
+  border:1px solid #3a6a3a !important;
+  border-left:3px solid #4aaa4a !important;
+  box-shadow: 0 0 8px rgba(74,170,74,.15);
+}
+.cand-rank { font-size:.63rem; color:var(--text-secondary); min-width:20px; text-align:center; font-family:'Playfair Display',serif; }
+.best-rank { color:var(--gold-light); font-size:.78rem; }
+.cand-mv { color:var(--text-primary); font-weight:600; flex:1; }
+.cand-sc { font-size:.8rem; font-weight:600; padding:2px 6px; border-radius:3px; }
+.cand.best .cand-sc, .cand.selected-cand .cand-sc { background:rgba(60,180,60,.15); color:#6ee87a; }
+.cand:not(.best):not(.selected-cand) .cand-sc { color:var(--gold-dim); }
+
+/* Mini preview board */
+.cand-preview {
+  position:absolute; z-index:200; pointer-events:none;
+  background:var(--panel); border:1px solid var(--border); border-radius:6px;
+  padding:6px; box-shadow:0 8px 30px rgba(0,0,0,.5);
+  display:none;
+}
+.cand-preview.show { display:block; }
+.mini-board {
+  display:grid; grid-template-columns:repeat(8,18px); grid-template-rows:repeat(8,18px);
+  border:1px solid var(--border); border-radius:2px; overflow:hidden;
+}
+.mini-sq { width:18px; height:18px; display:flex; align-items:center; justify-content:center; }
+.mini-sq.sq-light { background:var(--sq-light); }
+.mini-sq.sq-dark  { background:var(--sq-dark); }
+.mini-piece { width:12px; height:12px; border-radius:50%; }
+.mini-piece.red { background:var(--red-piece); }
+.mini-piece.black { background:#444; }
+.mini-piece.king { box-shadow:inset 0 0 0 2px rgba(255,215,80,.8); }
+.mini-hl-from { outline:2px solid rgba(255,220,50,.8); outline-offset:-2px; }
+.mini-hl-to   { outline:2px solid rgba(60,210,90,.8); outline-offset:-2px; }
+.mini-hl-cap  { outline:2px solid rgba(255,60,60,.8); outline-offset:-2px; }
+.mini-label { font-size:.6rem; color:var(--text-secondary); text-align:center; margin-top:4px; white-space:nowrap; }
+
+/* Legend */
+.legend { font-size:.78rem; color:var(--text-secondary); display:flex; flex-direction:column; gap:4px; }
+.leg-row { display:flex; align-items:center; gap:7px; }
+.leg-sw { width:14px;height:14px;border-radius:3px;flex-shrink:0; }
+.sw-from { background:rgba(255,220,50,.5); border:1px solid rgba(255,220,50,.7); }
+.sw-to   { background:rgba(60,210,90,.5);  border:1px solid rgba(60,210,90,.7); }
+.sw-cap  { background:rgba(255,60,60,.5);  border:1px solid rgba(255,60,60,.7); }
+
+#statusBar { font-size:.74rem; color:var(--text-secondary); text-align:center; min-height:16px; margin-top:3px; letter-spacing:.04em; }
+
+footer { margin-top:24px; font-size:.7rem; color:#555; letter-spacing:.06em; text-align:center; }
+
+.drag-ghost { position:fixed; pointer-events:none; z-index:1000; opacity:.85; transform:translate(-50%,-50%) scale(1.12); }
+
+/* View labels */
+.view-label {
+  display:flex; align-items:center; gap:6px;
+  font-size:.75rem; color:var(--text-secondary);
+  padding:4px 2px; letter-spacing:.06em;
+  text-transform:uppercase; font-weight:500;
+  width:var(--board-size);
+}
+.view-label.bottom { justify-content:flex-end; }
+
+/* ═══ GAME OVER OVERLAY ═══ */
+.game-over-overlay {
+  position:absolute; inset:0; z-index:100;
+  background:rgba(0,0,0,.7); display:flex; align-items:center; justify-content:center;
+  opacity:0; pointer-events:none; transition:opacity .3s;
+  border-radius:2px;
+}
+.game-over-overlay.show { opacity:1; pointer-events:auto; }
+.game-over-card {
+  background:var(--panel); border:2px solid var(--gold); border-radius:12px;
+  padding:24px 28px; text-align:center; max-width:280px;
+  box-shadow:0 8px 40px rgba(0,0,0,.6);
+}
+.game-over-card h2 {
+  font-family:'Playfair Display',serif; font-size:1.3rem; color:var(--gold-light); margin-bottom:8px;
+}
+.game-over-card p { font-size:.85rem; color:var(--text-secondary); margin-bottom:14px; line-height:1.5; }
+.game-over-card .btn-row { justify-content:center; }
+.game-over-close {
+  padding:8px 20px; border-radius:5px; border:1px solid var(--border);
+  background:var(--input-bg); color:var(--text-primary); cursor:pointer;
+  font-family:'DM Sans',sans-serif; font-size:.85rem; transition:all .15s;
+}
+.game-over-close:hover { border-color:var(--gold-dim); background:var(--hover-bg); }
+.game-over-dismiss {
+  position:absolute; top:8px; right:12px; font-size:1.2rem; color:var(--text-secondary);
+  cursor:pointer; background:none; border:none; z-index:101;
+}
+.game-over-dismiss:hover { color:var(--text-primary); }
+
+/* ═══ MODAL (Rules / Help) ═══ */
+.modal-overlay {
+  position:fixed; inset:0; z-index:500; background:rgba(0,0,0,.6);
+  display:flex; align-items:center; justify-content:center;
+  opacity:0; pointer-events:none; transition:opacity .2s;
+}
+.modal-overlay.show { opacity:1; pointer-events:auto; }
+.modal-card {
+  background:var(--panel); border:1px solid var(--border); border-radius:12px;
+  padding:28px 24px; max-width:520px; width:90%; max-height:80vh; overflow-y:auto;
+  box-shadow:0 12px 60px rgba(0,0,0,.6);
+  scrollbar-width:thin; scrollbar-color:var(--border) transparent;
+}
+.modal-card::-webkit-scrollbar { width:5px; }
+.modal-card::-webkit-scrollbar-thumb { background:var(--border); border-radius:3px; }
+.modal-card h2 { font-family:'Playfair Display',serif; font-size:1.2rem; color:var(--gold-light); margin-bottom:14px; }
+.modal-card h3 { font-size:.88rem; color:var(--gold); margin:14px 0 6px; font-weight:600; }
+.modal-card p, .modal-card li { font-size:.82rem; color:var(--text-secondary); line-height:1.65; }
+.modal-card ul { padding-left:18px; margin:6px 0; }
+.modal-card li { margin-bottom:4px; }
+.modal-close {
+  float:right; font-size:1.3rem; color:var(--text-secondary); cursor:pointer;
+  background:none; border:none; padding:0; line-height:1;
+}
+.modal-close:hover { color:var(--text-primary); }
+.modal-card strong { color:var(--text-primary); }
+
+/* ═══ CUSTOMIZATION PANEL (collapsible) ═══ */
+.collapsible-header {
+  display:flex; align-items:center; justify-content:space-between; cursor:pointer;
+  padding:4px 0;
+}
+.collapsible-header .stitle { margin-bottom:0; border-bottom:none; padding-bottom:0; flex:1; }
+.collapse-arrow { font-size:.7rem; color:var(--gold-dim); transition:transform .2s; }
+.collapse-arrow.open { transform:rotate(180deg); }
+.collapsible-body { overflow:hidden; max-height:0; transition:max-height .3s ease-out; }
+.collapsible-body.open { max-height:500px; }
+.color-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:5px; margin-top:6px; }
+.color-opt {
+  padding:7px 8px; border-radius:5px; border:2px solid var(--border);
+  background:var(--input-bg); cursor:pointer; text-align:center;
+  font-size:.72rem; color:var(--text-secondary); transition:all .12s;
+}
+.color-opt:hover { border-color:#666; }
+.color-opt.active { border-color:var(--gold); color:var(--gold-light); }
+.color-opt .swatch { display:flex; gap:3px; justify-content:center; margin-bottom:3px; }
+.color-opt .swatch span { width:16px; height:16px; border-radius:3px; border:1px solid rgba(255,255,255,.1); }
+
+/* ═══ RESPONSIVE ═══ */
+@media(max-width:860px){
+  :root { --sq-size: min(52px, calc((100vw - 40px) / 8)); }
+  .main { flex-direction:column; align-items:center; }
+  .panel { width:100%; max-width:calc(var(--board-size) + 40px); max-height:none; }
+  .piece { width:calc(var(--sq-size) * 0.78); height:calc(var(--sq-size) * 0.78); }
+}
+@media(max-width:480px){
+  :root { --sq-size: calc((100vw - 56px) / 8); }
+  .pal-piece,.pal-erase { width:34px; height:34px; }
+  body { padding:12px 8px 30px; }
+  .modal-card { padding:20px 16px; }
 }
 </style>
 </head>
 <body>
 
 <header>
-  <h1>Next <em>Checkers</em> Move</h1>
-  <p class="sub">Configure the board · Find the best move</p>
+  <div class="header-main">
+    <h1>Next <em>Checkers</em> Move</h1>
+    <p class="sub">Configure the board · Find the best move</p>
+  </div>
+  <div class="header-actions">
+    <button class="icon-btn" id="btnRules" onclick="openModal('rules')" aria-label="Game Rules">
+      📖<span class="tooltip">Game Rules</span>
+    </button>
+    <button class="icon-btn" id="btnHelp" onclick="openModal('help')" aria-label="How to Use">
+      ❓<span class="tooltip">How to Use</span>
+    </button>
+    <div style="position:relative;">
+      <button class="icon-btn" id="btnTheme" onclick="toggleThemeMenu()" aria-label="Theme">
+        🎨<span class="tooltip">Appearance</span>
+      </button>
+      <div class="theme-dropdown" id="themeDropdown">
+        <div style="font-size:.7rem;color:var(--gold-dim);letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px;font-weight:600;">Color Mode</div>
+        <label><input type="radio" name="colorMode" value="auto" checked onchange="setColorMode('auto')"> Auto (system)</label>
+        <label><input type="radio" name="colorMode" value="dark" onchange="setColorMode('dark')"> Dark</label>
+        <label><input type="radio" name="colorMode" value="light" onchange="setColorMode('light')"> Light</label>
+      </div>
+    </div>
+  </div>
 </header>
 
-<!-- Result banner like chesshub -->
+<!-- Result banner -->
 <div id="resultBanner">
   <span id="bannerText">Set up the board, choose who moves, then press Calculate.</span>
 </div>
 
 <div class="main">
-
   <!-- Board -->
   <div class="board-col">
-    <!-- Top player label -->
     <div class="view-label" id="topLabel">
       <span class="dot black" style="display:inline-block;"></span> Black's pieces
     </div>
@@ -395,19 +619,29 @@ footer { margin-top:28px; font-size:.73rem; color:#555; letter-spacing:.06em; te
       <div id="boardContainer">
         <div id="boardEl"></div>
         <svg id="arrowSvg" xmlns="http://www.w3.org/2000/svg"></svg>
+        <!-- Game over overlay -->
+        <div class="game-over-overlay" id="gameOverOverlay">
+          <button class="game-over-dismiss" onclick="dismissGameOver()">✕</button>
+          <div class="game-over-card">
+            <h2 id="gameOverTitle">Game Over!</h2>
+            <p id="gameOverMsg"></p>
+            <div class="btn-row" style="gap:8px;">
+              <button class="game-over-close" onclick="dismissGameOver()">Keep Looking</button>
+              <button class="game-over-close" onclick="doReset();dismissGameOver()">New Game</button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
     <div class="file-labels" id="fileLabels"></div>
-    <!-- Bottom player label -->
     <div class="view-label" id="botLabel">
       <span class="dot red" style="display:inline-block;"></span> Red's pieces
     </div>
-    <div id="statusBar">Click a dark (red) square to place the selected piece type.</div>
+    <div id="statusBar">Click a dark square to place the selected piece type.</div>
   </div>
 
   <!-- Panel -->
   <div class="panel">
-
     <!-- Turn -->
     <div>
       <div class="stitle">To Move</div>
@@ -421,7 +655,16 @@ footer { margin-top:28px; font-size:.73rem; color:#555; letter-spacing:.06em; te
       </div>
     </div>
 
-    <!-- Edit -->
+    <!-- Force jumps toggle -->
+    <div>
+      <div class="toggle-row">
+        <span>Force jumps</span>
+        <div class="toggle-switch on" id="forceJumpToggle" onclick="toggleForceJumps()"></div>
+      </div>
+      <p style="font-size:.68rem;color:var(--text-secondary);margin-top:4px;line-height:1.4;">When on, if a jump is available it must be taken (standard rules). Turn off to allow free choice.</p>
+    </div>
+
+    <!-- Edit board -->
     <div>
       <div class="stitle">Edit Board</div>
       <div class="pal-grid" id="palette">
@@ -446,7 +689,7 @@ footer { margin-top:28px; font-size:.73rem; color:#555; letter-spacing:.06em; te
           <span class="pal-lbl">Erase</span>
         </div>
       </div>
-      <p class="edit-hint" style="margin-top:8px;">Right-click any piece → toggle king.<br>Drag pieces to reposition them.</p>
+      <p class="edit-hint" style="margin-top:6px;">Right-click any piece → toggle king. Drag pieces to reposition.</p>
     </div>
 
     <!-- Counts -->
@@ -474,9 +717,7 @@ footer { margin-top:28px; font-size:.73rem; color:#555; letter-spacing:.06em; te
 
     <!-- Execute move -->
     <div class="exec-wrap">
-      <button class="btn btn-exec" id="execBtn" onclick="doExecute()" disabled>
-        ▶ Execute Move
-      </button>
+      <button class="btn btn-exec" id="execBtn" onclick="doExecute()" disabled>▶ Execute Move</button>
       <div class="exec-info" id="execInfo"></div>
     </div>
 
@@ -485,44 +726,28 @@ footer { margin-top:28px; font-size:.73rem; color:#555; letter-spacing:.06em; te
       <button class="btn btn-sec" onclick="doClear()">✕ Clear</button>
     </div>
 
-    <!-- Orientation controls -->
+    <!-- Board orientation -->
     <div>
       <div class="stitle">Board Orientation</div>
       <div class="orient-grid">
         <button class="orient-btn flip-active" id="o00" onclick="setOrientation(false,false)" title="Red bottom, a→h">
-          <div class="ob-mini">
-            <div class="ob-row"><span class="ob-dot black"></span><span class="ob-dot black"></span></div>
-            <div class="ob-mid">· · ·</div>
-            <div class="ob-row"><span class="ob-dot red"></span><span class="ob-dot red"></span></div>
-          </div>
-          <span class="ob-label">a→h &nbsp;Red ↓</span>
+          <div class="ob-mini"><div class="ob-row"><span class="ob-dot black"></span><span class="ob-dot black"></span></div><div class="ob-mid">· · ·</div><div class="ob-row"><span class="ob-dot red"></span><span class="ob-dot red"></span></div></div>
+          <span class="ob-label">a→h Red ↓</span>
         </button>
         <button class="orient-btn" id="o10" onclick="setOrientation(true,false)" title="Red top, a→h">
-          <div class="ob-mini">
-            <div class="ob-row"><span class="ob-dot red"></span><span class="ob-dot red"></span></div>
-            <div class="ob-mid">· · ·</div>
-            <div class="ob-row"><span class="ob-dot black"></span><span class="ob-dot black"></span></div>
-          </div>
-          <span class="ob-label">a→h &nbsp;Red ↑</span>
+          <div class="ob-mini"><div class="ob-row"><span class="ob-dot red"></span><span class="ob-dot red"></span></div><div class="ob-mid">· · ·</div><div class="ob-row"><span class="ob-dot black"></span><span class="ob-dot black"></span></div></div>
+          <span class="ob-label">a→h Red ↑</span>
         </button>
         <button class="orient-btn" id="o01" onclick="setOrientation(false,true)" title="Red bottom, h→a">
-          <div class="ob-mini">
-            <div class="ob-row"><span class="ob-dot black"></span><span class="ob-dot black"></span></div>
-            <div class="ob-mid">· · ·</div>
-            <div class="ob-row"><span class="ob-dot red"></span><span class="ob-dot red"></span></div>
-          </div>
-          <span class="ob-label">h→a &nbsp;Red ↓</span>
+          <div class="ob-mini"><div class="ob-row"><span class="ob-dot black"></span><span class="ob-dot black"></span></div><div class="ob-mid">· · ·</div><div class="ob-row"><span class="ob-dot red"></span><span class="ob-dot red"></span></div></div>
+          <span class="ob-label">h→a Red ↓</span>
         </button>
         <button class="orient-btn" id="o11" onclick="setOrientation(true,true)" title="Red top, h→a">
-          <div class="ob-mini">
-            <div class="ob-row"><span class="ob-dot red"></span><span class="ob-dot red"></span></div>
-            <div class="ob-mid">· · ·</div>
-            <div class="ob-row"><span class="ob-dot black"></span><span class="ob-dot black"></span></div>
-          </div>
-          <span class="ob-label">h→a &nbsp;Red ↑</span>
+          <div class="ob-mini"><div class="ob-row"><span class="ob-dot red"></span><span class="ob-dot red"></span></div><div class="ob-mid">· · ·</div><div class="ob-row"><span class="ob-dot black"></span><span class="ob-dot black"></span></div></div>
+          <span class="ob-label">h→a Red ↑</span>
         </button>
       </div>
-      <div class="btn-row" style="margin-top:8px;">
+      <div class="btn-row" style="margin-top:6px;">
         <button class="btn btn-flip" id="btnFlipV" onclick="toggleFlipV()">↕ Flip Vertical</button>
         <button class="btn btn-flip" id="btnFlipH" onclick="toggleFlipH()">↔ Flip Horizontal</button>
       </div>
@@ -534,6 +759,43 @@ footer { margin-top:28px; font-size:.73rem; color:#555; letter-spacing:.06em; te
       <div class="cands" id="candList"></div>
     </div>
 
+    <!-- Customization (collapsible) -->
+    <div>
+      <div class="collapsible-header" onclick="toggleCollapsible(this)">
+        <div class="stitle">Customize Board</div>
+        <span class="collapse-arrow">▼</span>
+      </div>
+      <div class="collapsible-body">
+        <div style="font-size:.72rem;color:var(--text-secondary);margin-bottom:6px;">Board Theme</div>
+        <div class="color-grid" id="boardThemeGrid">
+          <div class="color-opt active" onclick="setBoardTheme('classic',this)">
+            <div class="swatch"><span style="background:#c0392b"></span><span style="background:#1a1a1a"></span></div>Classic
+          </div>
+          <div class="color-opt" onclick="setBoardTheme('wood',this)">
+            <div class="swatch"><span style="background:#c49a6c"></span><span style="background:#6b3a2a"></span></div>Wood
+          </div>
+          <div class="color-opt" onclick="setBoardTheme('ocean',this)">
+            <div class="swatch"><span style="background:#4a90a4"></span><span style="background:#1a3a4a"></span></div>Ocean
+          </div>
+          <div class="color-opt" onclick="setBoardTheme('forest',this)">
+            <div class="swatch"><span style="background:#5a9a5a"></span><span style="background:#1a3a1a"></span></div>Forest
+          </div>
+          <div class="color-opt" onclick="setBoardTheme('royal',this)">
+            <div class="swatch"><span style="background:#8a5acc"></span><span style="background:#2a1a4a"></span></div>Royal
+          </div>
+          <div class="color-opt" onclick="setBoardTheme('marble',this)">
+            <div class="swatch"><span style="background:#d8d0c0"></span><span style="background:#4a4a4a"></span></div>Marble
+          </div>
+        </div>
+        <div style="font-size:.72rem;color:var(--text-secondary);margin:10px 0 6px;">Piece Style</div>
+        <div class="color-grid" id="pieceStyleGrid">
+          <div class="color-opt active" onclick="setPieceStyle('classic',this)">Classic</div>
+          <div class="color-opt" onclick="setPieceStyle('flat',this)">Flat</div>
+          <div class="color-opt" onclick="setPieceStyle('neon',this)">Neon</div>
+        </div>
+      </div>
+    </div>
+
     <!-- Legend -->
     <div>
       <div class="stitle">Legend</div>
@@ -543,7 +805,71 @@ footer { margin-top:28px; font-size:.73rem; color:#555; letter-spacing:.06em; te
         <div class="leg-row"><div class="leg-sw sw-cap"></div> Captured piece</div>
       </div>
     </div>
+  </div>
+</div>
 
+<!-- Mini preview tooltip (positioned absolutely) -->
+<div class="cand-preview" id="candPreview"></div>
+
+<!-- Rules modal -->
+<div class="modal-overlay" id="rulesModal">
+  <div class="modal-card">
+    <button class="modal-close" onclick="closeModal('rules')">✕</button>
+    <h2>📖 Checkers Rules</h2>
+    <h3>Objective</h3>
+    <p>Capture all your opponent's pieces, or block them so they have no legal moves.</p>
+    <h3>Setup</h3>
+    <p>Each player starts with 12 pieces on the dark squares of the three rows closest to them. Red moves first.</p>
+    <h3>Movement</h3>
+    <ul>
+      <li>Regular pieces move <strong>diagonally forward</strong> one square at a time onto empty dark squares.</li>
+      <li><strong>Kings</strong> (crowned when reaching the last row) can move diagonally in <strong>any direction</strong>.</li>
+    </ul>
+    <h3>Capturing</h3>
+    <ul>
+      <li>Jump over an adjacent opponent piece to capture it, landing on the empty square beyond.</li>
+      <li><strong>Multi-jumps:</strong> if another capture is available after landing, you must continue jumping in the same turn.</li>
+      <li><strong>Forced jumps</strong> (standard rules): if a jump is available, you <em>must</em> take it. You can toggle this off in settings.</li>
+    </ul>
+    <h3>Becoming a King</h3>
+    <p>When a piece reaches the opponent's back row, it becomes a <strong>king</strong> (marked with ♛). Kings can move and capture in all four diagonal directions.</p>
+    <h3>Winning</h3>
+    <p>You win when your opponent has no pieces left or no legal moves available.</p>
+  </div>
+</div>
+
+<!-- Help modal -->
+<div class="modal-overlay" id="helpModal">
+  <div class="modal-card">
+    <button class="modal-close" onclick="closeModal('help')">✕</button>
+    <h2>❓ How to Use This Tool</h2>
+    <h3>Setting Up the Board</h3>
+    <ul>
+      <li>Click <strong>Reset</strong> to start with the standard opening position, or <strong>Clear</strong> for an empty board.</li>
+      <li>Select a piece type from the <strong>Edit Board</strong> palette, then click dark squares to place pieces.</li>
+      <li><strong>Drag</strong> pieces to move them around the board.</li>
+      <li><strong>Right-click</strong> a piece to toggle it between regular and king.</li>
+    </ul>
+    <h3>Calculating the Best Move</h3>
+    <ul>
+      <li>Choose who moves next with <strong>To Move</strong> (Red or Black).</li>
+      <li>Pick a <strong>Search Depth</strong> — higher = stronger but slower.</li>
+      <li>Press <strong>⚙ Calculate Best Move</strong> to find the AI's recommended move.</li>
+    </ul>
+    <h3>Executing Moves</h3>
+    <ul>
+      <li>After calculating, the best move is highlighted with arrows on the board.</li>
+      <li>Click any <strong>Candidate Move</strong> to see its preview and highlight.</li>
+      <li>Press <strong>▶ Execute Move</strong> to apply the selected move with animation.</li>
+    </ul>
+    <h3>Customization</h3>
+    <ul>
+      <li>Use the <strong>🎨</strong> button to switch between dark, light, or auto (system) mode.</li>
+      <li>Open <strong>Customize Board</strong> in the panel to change board colors and piece style.</li>
+      <li>Use <strong>Board Orientation</strong> to flip the view.</li>
+    </ul>
+    <h3>Force Jumps</h3>
+    <p>The <strong>Force jumps</strong> toggle controls whether mandatory jump rules are enforced. In standard checkers, if a jump is available you must take it. Toggle off for casual play.</p>
   </div>
 </div>
 
@@ -567,8 +893,8 @@ let arrowSegs = [];
 let dragSrc = null, dragGhost = null;
 let bestMove = null;
 let nodeCount = 0;
+let forceJumps = true;
 
-/* Helpers */
 const isRed  = v=>v===1||v===3;
 const isBlk  = v=>v===2||v===4;
 const isKing = v=>v===3||v===4;
@@ -580,14 +906,82 @@ const FILES  = ['a','b','c','d','e','f','g','h'];
 const note   = (r,c)=>FILES[c]+(8-r);
 const sqPlay = (r,c)=>(r+c)%2===1;
 
-/* Visual ↔ board coordinate mapping (independent V and H flips) */
 const bR = dr => flipV ? 7-dr : dr;
 const bC = dc => flipH ? 7-dc : dc;
 const vR = r  => flipV ? 7-r  : r;
 const vC = c  => flipH ? 7-c  : c;
 
-/* Square color — pieces sit on RED squares */
-const sqCls = (r,c) => (r+c)%2===1 ? 'sq-red' : 'sq-black';
+const sqCls = (r,c) => (r+c)%2===1 ? 'sq-light' : 'sq-dark';
+
+/* ══════════════════════════════════════════════════════
+   THEME / COLOR MODE
+══════════════════════════════════════════════════════ */
+let colorMode = 'auto';
+const mql = window.matchMedia('(prefers-color-scheme: light)');
+
+function applyColorMode() {
+  let isLight = false;
+  if (colorMode === 'light') isLight = true;
+  else if (colorMode === 'dark') isLight = false;
+  else isLight = mql.matches;
+  document.documentElement.classList.toggle('light', isLight);
+}
+function setColorMode(mode) {
+  colorMode = mode;
+  document.querySelectorAll('input[name="colorMode"]').forEach(r => r.checked = r.value === mode);
+  applyColorMode();
+}
+mql.addEventListener('change', () => { if (colorMode === 'auto') applyColorMode(); });
+applyColorMode();
+
+function toggleThemeMenu() {
+  const dd = document.getElementById('themeDropdown');
+  dd.classList.toggle('open');
+}
+document.addEventListener('click', e => {
+  const dd = document.getElementById('themeDropdown');
+  if (!dd.contains(e.target) && e.target.id !== 'btnTheme' && !e.target.closest('#btnTheme')) dd.classList.remove('open');
+});
+
+/* Board / piece customization */
+let currentBoardTheme = 'classic';
+let currentPieceStyle = 'classic';
+
+function setBoardTheme(theme, el) {
+  currentBoardTheme = theme;
+  document.getElementById('boardThemeGrid').querySelectorAll('.color-opt').forEach(o => o.classList.remove('active'));
+  if (el) el.classList.add('active');
+  // Apply via CSS variables
+  const themes = {
+    classic: ['#c0392b','#1a1a1a'], wood: ['#c49a6c','#6b3a2a'],
+    ocean: ['#4a90a4','#1a3a4a'], forest: ['#5a9a5a','#1a3a1a'],
+    royal: ['#8a5acc','#2a1a4a'], marble: ['#d8d0c0','#4a4a4a']
+  };
+  const [l,d] = themes[theme];
+  document.documentElement.style.setProperty('--sq-light', l);
+  document.documentElement.style.setProperty('--sq-dark', d);
+}
+
+function setPieceStyle(style, el) {
+  currentPieceStyle = style;
+  document.getElementById('pieceStyleGrid').querySelectorAll('.color-opt').forEach(o => o.classList.remove('active'));
+  if (el) el.classList.add('active');
+  document.body.classList.remove('piece-style-classic','piece-style-flat','piece-style-neon');
+  document.body.classList.add('piece-style-' + style);
+}
+
+function toggleCollapsible(header) {
+  const body = header.nextElementSibling;
+  const arrow = header.querySelector('.collapse-arrow');
+  body.classList.toggle('open');
+  arrow.classList.toggle('open');
+}
+
+/* Force jumps toggle */
+function toggleForceJumps() {
+  forceJumps = !forceJumps;
+  document.getElementById('forceJumpToggle').classList.toggle('on', forceJumps);
+}
 
 /* ══════════════════════════════════════════════════════
    RESET / CLEAR / ORIENTATION
@@ -607,23 +1001,12 @@ function doClear() {
   renderBoard(); setBanner('Configure the board, then press Calculate.');
 }
 
-function toggleFlipV() {
-  flipV = !flipV;
-  syncOrientBtns();
-  updateEdgeLabels();
-  renderBoard();
-}
-function toggleFlipH() {
-  flipH = !flipH;
-  syncOrientBtns();
-  updateEdgeLabels();
-  renderBoard();
-}
+function toggleFlipV() { flipV=!flipV; syncOrientBtns(); updateEdgeLabels(); renderBoard(); }
+function toggleFlipH() { flipH=!flipH; syncOrientBtns(); updateEdgeLabels(); renderBoard(); }
 
 function syncOrientBtns() {
   document.getElementById('btnFlipV').classList.toggle('flip-active', flipV);
   document.getElementById('btnFlipH').classList.toggle('flip-active', flipH);
-  // update the 4 preset buttons
   const match = (v,h) => flipV===v && flipH===h;
   ['o00','o10','o01','o11'].forEach(id => document.getElementById(id).classList.remove('flip-active'));
   if(match(false,false)) document.getElementById('o00').classList.add('flip-active');
@@ -633,28 +1016,18 @@ function syncOrientBtns() {
 }
 
 function setOrientation(v, h) {
-  flipV=v; flipH=h;
-  syncOrientBtns();
-  updateEdgeLabels();
-  renderBoard();
+  flipV=v; flipH=h; syncOrientBtns(); updateEdgeLabels(); renderBoard();
 }
 
 function updateEdgeLabels() {
-  // top-left corner = board row bR(0), col bC(0)
-  // red is in rows 5-7, black in rows 0-2
-  const topRow = bR(0); // board row at visual top
+  const topRow = bR(0);
   const topIsRed = topRow >= 5;
-  const leftCol  = bC(0); // board col at visual left
-  // The label above shows who's at top; below shows who's at bottom
-  const topColor  = topIsRed ? 'red'   : 'black';
+  const topColor  = topIsRed ? 'red' : 'black';
   const botColor  = topIsRed ? 'black' : 'red';
-  const leftLabel = FILES[leftCol];
+  const leftLabel = FILES[bC(0)];
   const rightLabel= FILES[bC(7)];
-
-  const topEl = document.getElementById('topLabel');
-  const botEl = document.getElementById('botLabel');
-  topEl.innerHTML = dotHTML(topColor) + ' ' + cap(topColor) + '\'s pieces &nbsp;<span style="color:var(--gold-dim);font-size:.7rem;">('+leftLabel+'→'+rightLabel+')</span>';
-  botEl.innerHTML = dotHTML(botColor) + ' ' + cap(botColor) + '\'s pieces';
+  document.getElementById('topLabel').innerHTML = dotHTML(topColor)+' '+cap(topColor)+'\'s pieces <span style="color:var(--gold-dim);font-size:.68rem;">('+leftLabel+'→'+rightLabel+')</span>';
+  document.getElementById('botLabel').innerHTML = dotHTML(botColor)+' '+cap(botColor)+'\'s pieces';
 }
 
 function dotHTML(c) { return '<span class="dot '+c+'" style="display:inline-block;vertical-align:middle;"></span>'; }
@@ -676,7 +1049,6 @@ function renderBoard() {
       if(highlights[key]) sq.classList.add(highlights[key]);
       sq.dataset.r=r; sq.dataset.c=c;
 
-      // Highlight overlay div
       const hl=document.createElement('div');
       hl.className='sq-hl';
       sq.appendChild(hl);
@@ -738,7 +1110,7 @@ function updateCounts() {
 }
 
 /* ══════════════════════════════════════════════════════
-   SVG ARROWS  (like chesshub numbered circles)
+   SVG ARROWS
 ══════════════════════════════════════════════════════ */
 function renderArrows() {
   const svg=document.getElementById('arrowSvg');
@@ -762,7 +1134,7 @@ function renderArrows() {
 
   for(const a of arrowSegs) {
     const x1=cx(a.from[0],a.from[1]), y1=cy(a.from[0],a.from[1]);
-    const x2=cx(a.to[0],  a.to[1]),   y2=cy(a.to[0],  a.to[1]);
+    const x2=cx(a.to[0],a.to[1]),     y2=cy(a.to[0],a.to[1]);
     const dx=x2-x1, dy=y2-y1, len=Math.sqrt(dx*dx+dy*dy)||1;
     const ux=dx/len, uy=dy/len;
     const lx1=x1+ux*sq*.22, ly1=y1+uy*sq*.22;
@@ -780,7 +1152,6 @@ function renderArrows() {
     line.setAttribute('marker-end','url(#'+mkId+')');
     svg.appendChild(line);
 
-    // Circle at destination
     const circ=svgE('circle');
     circ.setAttribute('cx',x2); circ.setAttribute('cy',y2);
     circ.setAttribute('r','14'); circ.setAttribute('fill',col);
@@ -798,9 +1169,7 @@ function svgE(tag) { return document.createElementNS('http://www.w3.org/2000/svg
 
 function buildArrows(mv) {
   arrowSegs=[];
-  const pts = mv.jumps.length
-    ? [mv.from, ...mv.jumps.map(j=>j.land)]
-    : [mv.from, mv.to];
+  const pts = mv.jumps.length ? [mv.from, ...mv.jumps.map(j=>j.land)] : [mv.from, mv.to];
   for(let i=0;i<pts.length-1;i++) {
     arrowSegs.push({ from:pts[i], to:pts[i+1], num:i+1, color:i===0?'green':'blue' });
   }
@@ -875,6 +1244,35 @@ function onDrop(r,c) {
 }
 
 /* ══════════════════════════════════════════════════════
+   MODALS
+══════════════════════════════════════════════════════ */
+function openModal(type) {
+  const id = type === 'rules' ? 'rulesModal' : 'helpModal';
+  document.getElementById(id).classList.add('show');
+}
+function closeModal(type) {
+  const id = type === 'rules' ? 'rulesModal' : 'helpModal';
+  document.getElementById(id).classList.remove('show');
+}
+document.querySelectorAll('.modal-overlay').forEach(m => {
+  m.addEventListener('click', e => { if(e.target === m) m.classList.remove('show'); });
+});
+
+/* Game over */
+function showGameOver(winner) {
+  const overlay = document.getElementById('gameOverOverlay');
+  const title = document.getElementById('gameOverTitle');
+  const msg = document.getElementById('gameOverMsg');
+  const loser = winner === 'red' ? 'Black' : 'Red';
+  title.textContent = cap(winner) + ' Wins!';
+  msg.textContent = loser + ' has no legal moves remaining. ' + cap(winner) + ' wins the game.';
+  overlay.classList.add('show');
+}
+function dismissGameOver() {
+  document.getElementById('gameOverOverlay').classList.remove('show');
+}
+
+/* ══════════════════════════════════════════════════════
    CHECKERS ENGINE
 ══════════════════════════════════════════════════════ */
 function getDirs(val,color) {
@@ -882,8 +1280,6 @@ function getDirs(val,color) {
   return color==='red'?[[-1,-1],[-1,1]]:[[1,-1],[1,1]];
 }
 
-/* Returns list of full jump move objects from (r,c)
-   Each jump object has .land and .cap coords */
 function getJumps(b,r,c,color,visited) {
   const val=b[r][c]; if(!val) return [];
   const dirs=getDirs(val,color);
@@ -942,7 +1338,8 @@ function getLegal(b,color) {
       simples.push(...getSimple(b,r,c,color));
     }
   }
-  return jumps.length?jumps:simples;
+  if (forceJumps) return jumps.length ? jumps : simples;
+  return [...jumps, ...simples];
 }
 
 function evaluate(b) {
@@ -1002,14 +1399,20 @@ async function doCalc() {
 
   try {
     const scored=await asyncRun(()=>scoreMoves(board,turn,depth));
-    if(!scored.length){ setBanner('No legal moves — this side has lost!'); setSt('No moves for '+turn+'.'); btn.disabled=false; return; }
+    if(!scored.length){
+      // No legal moves — game over
+      const winner = turn === 'red' ? 'black' : 'red';
+      setBanner('No legal moves — <strong style="color:var(--gold-light)">'+cap(winner)+' wins!</strong>');
+      setSt('No moves for '+turn+'.');
+      showGameOver(winner);
+      btn.disabled=false;
+      return;
+    }
     const best=scored[0];
     bestMove=best;
 
-    // Highlight + arrows
     highlightMove(best);
 
-    // Banner — structured format
     const mvStr=fmtMv(best);
     const seqStr=scored.length>1?fmtMv(scored[1]):null;
     const sc=best.score;
@@ -1023,10 +1426,7 @@ async function doCalc() {
     const banEl=document.getElementById('resultBanner');
     banEl.innerHTML=html; banEl.classList.add('active'); banEl.classList.remove('banner-alt');
 
-    // Enable execute button
     setExecBtn(true, mvStr, best.jumps.length);
-
-    // Candidates
     showCands(scored.slice(0,Math.min(7,scored.length)));
     setSt('Best: '+mvStr+' · '+nodeCount.toLocaleString()+' nodes analysed');
 
@@ -1035,19 +1435,15 @@ async function doCalc() {
 }
 
 /* ══════════════════════════════════════════════════════
-   EXECUTE MOVE
+   EXECUTE MOVE — with real-time animation (Feature 8)
 ══════════════════════════════════════════════════════ */
 function setExecBtn(enabled, mvStr, captureCount) {
   const btn=document.getElementById('execBtn');
   const info=document.getElementById('execInfo');
   if(!enabled){
-    btn.disabled=true;
-    btn.classList.remove('exec-ready');
-    info.textContent='';
-    return;
+    btn.disabled=true; btn.classList.remove('exec-ready'); info.textContent=''; return;
   }
-  btn.disabled=false;
-  btn.classList.add('exec-ready');
+  btn.disabled=false; btn.classList.add('exec-ready');
   if(captureCount>0){
     info.innerHTML = `▶ Will move <strong>${mvStr}</strong> and capture ${captureCount} piece${captureCount>1?'s':''}`;
   } else {
@@ -1061,68 +1457,94 @@ async function doExecute() {
   const execBtn = document.getElementById('execBtn');
   execBtn.disabled = true;
 
-  // --- Animate: flash captured squares red then remove ---
+  const container = document.getElementById('boardContainer');
+  const sq = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--sq-size'))||70;
+
+  // Create animated piece element
+  const fromVal = board[mv.from[0]][mv.from[1]];
+  const animPiece = document.createElement('div');
+  animPiece.className = 'piece piece-anim '+(isRed(fromVal)?'red':'black')+(isKing(fromVal)?' king':'');
+  animPiece.style.width = (sq*0.78)+'px';
+  animPiece.style.height = (sq*0.78)+'px';
+  const offset = (sq - sq*0.78)/2;
+
+  // Position at from square
+  const fromVR = vR(mv.from[0]), fromVC = vC(mv.from[1]);
+  animPiece.style.top = (fromVR * sq + offset) + 'px';
+  animPiece.style.left = (fromVC * sq + offset) + 'px';
+  container.appendChild(animPiece);
+
+  // Hide original piece
+  const origSq = document.querySelector(`[data-r="${mv.from[0]}"][data-c="${mv.from[1]}"] .piece`);
+  if(origSq) origSq.style.opacity = '0';
+
+  await sleep(50);
+
   if(mv.jumps.length) {
-    // Flash captures
-    for(const j of mv.jumps) {
-      const capKey = j.cap[0]+','+j.cap[1];
-      highlights[capKey] = 'hl-cap';
-    }
-    renderBoard();
-    await sleep(300);
+    // Animate through each jump
+    for(let i=0; i<mv.jumps.length; i++) {
+      const j = mv.jumps[i];
+      const landVR = vR(j.land[0]), landVC = vC(j.land[1]);
 
-    // Fade-out captured pieces visually
-    for(const j of mv.jumps) {
-      const capSq = document.querySelector(`[data-r="${j.cap[0]}"][data-c="${j.cap[1]}"]`);
-      if(capSq){
-        const p = capSq.querySelector('.piece');
-        if(p){ p.style.transition='transform .25s,opacity .25s'; p.style.transform='scale(0.1)'; p.style.opacity='0'; }
+      // Move piece to landing square
+      animPiece.style.top = (landVR * sq + offset) + 'px';
+      animPiece.style.left = (landVC * sq + offset) + 'px';
+      await sleep(380);
+
+      // Flash and fade captured piece
+      const capSq = document.querySelector(`[data-r="${j.cap[0]}"][data-c="${j.cap[1]}"] .piece`);
+      if(capSq) {
+        capSq.style.transition = 'transform .2s, opacity .2s';
+        capSq.style.transform = 'scale(0.1)';
+        capSq.style.opacity = '0';
       }
+      await sleep(150);
     }
-    await sleep(280);
+  } else {
+    // Simple move animation
+    const toVR = vR(mv.to[0]), toVC = vC(mv.to[1]);
+    animPiece.style.top = (toVR * sq + offset) + 'px';
+    animPiece.style.left = (toVC * sq + offset) + 'px';
+    await sleep(400);
   }
 
-  // --- Flash the moving piece ---
-  const fromSq = document.querySelector(`[data-r="${mv.from[0]}"][data-c="${mv.from[1]}"]`);
-  if(fromSq){
-    const p=fromSq.querySelector('.piece');
-    if(p){ p.style.transition='transform .15s'; p.style.transform='scale(1.18)'; }
-    await sleep(150);
-  }
+  // Remove animated piece
+  animPiece.remove();
 
-  // --- Apply the move to board state ---
+  // Apply the move to board state
   board = mv.boardAfter.map(row=>[...row]);
 
-  // --- Switch turn ---
+  // Switch turn
   const nextTurn = turn==='red'?'black':'red';
 
-  // --- Clear highlights and arrows ---
-  highlights={};
-  arrowSegs=[];
-  bestMove=null;
-  hideCands();
-
-  // --- Re-render ---
+  highlights={}; arrowSegs=[]; bestMove=null; hideCands();
   renderBoard();
-
-  // --- Update turn ---
   setTurn(nextTurn);
 
-  // --- Update banner ---
   const mvStr=fmtMv(mv);
   const capCount=mv.jumps.length;
   let msg = `Move executed: <strong style="color:var(--gold-light)">${mvStr}</strong>`;
-  if(capCount) msg += ` — <span style="color:#f87171;">${capCount} piece${capCount>1?'s':''} captured! 🔥</span>`;
-  msg += `  &nbsp;<span style="color:var(--cream-dim);font-size:.8rem;">Now ${nextTurn}'s turn — press Calculate for the next best move.</span>`;
+  if(capCount) msg += ` — <span style="color:#f87171;">${capCount} piece${capCount>1?'s':''} captured!</span>`;
+  msg += `  <span style="color:var(--text-secondary);font-size:.78rem;">Now ${nextTurn}'s turn — press Calculate for the next best move.</span>`;
   const banEl=document.getElementById('resultBanner');
   banEl.innerHTML=msg; banEl.classList.add('active');
 
   setExecBtn(false);
   setSt('Move executed. '+cap(nextTurn)+'\'s turn.');
+
+  // Check if game is over for the new turn
+  const nextMoves = getLegal(board, nextTurn);
+  if(!nextMoves.length) {
+    const winner = nextTurn === 'red' ? 'black' : 'red';
+    setTimeout(() => showGameOver(winner), 600);
+  }
 }
 
-let allScoredMoves = [];  // full scored list from last calc
-let selectedMoveIdx = 0; // which candidate is currently selected/highlighted
+/* ══════════════════════════════════════════════════════
+   CANDIDATES + MINI PREVIEW (Feature 9)
+══════════════════════════════════════════════════════ */
+let allScoredMoves = [];
+let selectedMoveIdx = 0;
 
 function showCands(scored) {
   allScoredMoves = scored;
@@ -1139,6 +1561,8 @@ function showCands(scored) {
     const rank = i === 0 ? '<span class="cand-rank best-rank">★</span>' : `<span class="cand-rank">#${i+1}</span>`;
     d.innerHTML = `${rank}<span class="cand-mv">${fmtMv(mv)}</span><span class="cand-sc">${s > 0 ? '+' : ''}${s}</span>`;
     d.addEventListener('click', () => selectCandidate(i));
+    d.addEventListener('mouseenter', (e) => showMiniPreview(i, e));
+    d.addEventListener('mouseleave', () => hideMiniPreview());
     list.appendChild(d);
   });
 }
@@ -1146,26 +1570,18 @@ function showCands(scored) {
 function selectCandidate(i) {
   const mv = allScoredMoves[i];
   if (!mv) return;
-
-  // Update visual selection in list
   selectedMoveIdx = i;
   document.querySelectorAll('.cand').forEach((el, j) => {
     el.classList.toggle('selected-cand', j === i);
   });
-
-  // Update board highlights + arrows
   highlightMove(mv);
-
-  // Update execute button
   setExecBtn(true, fmtMv(mv), mv.jumps.length);
   bestMove = mv;
 
-  // Update banner to reflect selected candidate
   const mvStr  = fmtMv(mv);
   const sc     = mv.score;
   const isAIBest = (i === 0);
   const type   = mv.jumps.length > 1 ? 'Multi-jump capture' : mv.jumps.length === 1 ? 'Capture' : 'Quiet move';
-  const scBetter = turn === 'red' ? (sc >= allScoredMoves[0].score) : (sc <= allScoredMoves[0].score);
 
   let html = '';
   if (isAIBest) {
@@ -1188,11 +1604,57 @@ function selectCandidate(i) {
   banEl.classList.toggle('banner-alt', !isAIBest);
 }
 
+/* Mini preview board on hover */
+function showMiniPreview(i, event) {
+  const mv = allScoredMoves[i];
+  if (!mv || !mv.boardAfter) return;
+
+  const preview = document.getElementById('candPreview');
+  let html = '<div class="mini-board">';
+  for(let r=0;r<8;r++) {
+    for(let c=0;c<8;c++) {
+      const cls = sqCls(r,c);
+      let hlCls = '';
+      if(mv.from[0]===r && mv.from[1]===c) hlCls = ' mini-hl-from';
+      if(mv.to[0]===r && mv.to[1]===c) hlCls = ' mini-hl-to';
+      for(const j of mv.jumps) { if(j.cap[0]===r && j.cap[1]===c) hlCls = ' mini-hl-cap'; }
+      html += `<div class="mini-sq ${cls}${hlCls}">`;
+      const v = mv.boardAfter[r][c];
+      if(v) {
+        const pc = isRed(v) ? 'red' : 'black';
+        const kc = isKing(v) ? ' king' : '';
+        html += `<div class="mini-piece ${pc}${kc}"></div>`;
+      }
+      html += '</div>';
+    }
+  }
+  html += '</div>';
+  html += `<div class="mini-label">${fmtMv(mv)} → result</div>`;
+  preview.innerHTML = html;
+
+  // Position near the hovered element
+  const rect = event.currentTarget.getBoundingClientRect();
+  const pw = 160, ph = 180;
+  let left = rect.left - pw - 10;
+  let top = rect.top - 20;
+  if (left < 10) left = rect.right + 10;
+  if (top + ph > window.innerHeight) top = window.innerHeight - ph - 10;
+  if (top < 10) top = 10;
+  preview.style.left = left + 'px';
+  preview.style.top = top + 'px';
+  preview.classList.add('show');
+}
+
+function hideMiniPreview() {
+  document.getElementById('candPreview').classList.remove('show');
+}
+
 function hideCands() {
   allScoredMoves = [];
   selectedMoveIdx = 0;
   document.getElementById('candSec').style.display = 'none';
   document.getElementById('candList').innerHTML = '';
+  hideMiniPreview();
 }
 
 function fmtMv(mv){ return note(mv.from[0],mv.from[1])+(mv.jumps.length?'x':'-')+note(mv.to[0],mv.to[1]); }
