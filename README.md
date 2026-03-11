@@ -3,17 +3,17 @@ An interactive, browser-based checkers analysis tool that calculates the next be
 
 # Features: 
 · Fully configurable board editor that lets you place, remove, and drag pieces freely <br>
-· Best move calculated and displayed with animated visual (SVG) arrows and numbered move sequences, along with a ranked list of candidate moves with evaluation scores
-· Adjustable search depth (4–10 moves ahead)
-· Fully configurable and customizable board editor allowing you to place, erase, remove, or drag any red/black/king pieces freely
-· Full candidate move list with evaluation scores
-· Right-click any piece to toggle king
-· Board rotation controls to view from any side (flip the board vertically, horizontally, or both — play as red or black from any perspective)
-· Coordinate labels (a–h, 1–8)
-· Highlighted from/to squares and captured pieces
-· Reset to starting position or start from a blank board
-· Choose whose turn it is (Red or Black)
-· Flip the board in any of 4 orientations (independent vertical AND horizontal flipping — not just a 180° rotate - with separate ↕ and ↔ flip controls giving all possible board orientation/configuration)
-· No installs, no backend — runs entirely in your browser
+· Best move calculated and displayed with animated visual (SVG) arrows and numbered move sequences, along with a ranked list of candidate moves with evaluation scores <br>
+· Adjustable search depth (4–10 moves ahead) <br>
+· Fully configurable and customizable board editor allowing you to place, erase, remove, or drag any red/black/king pieces freely <br>
+· Full candidate move list with evaluation scores <br>
+· Right-click any piece to toggle king <br>
+· Board rotation controls to view from any side (flip the board vertically, horizontally, or both — play as red or black from any perspective) <br>
+· Coordinate labels (a–h, 1–8) <br>
+· Highlighted from/to squares and captured pieces <br>
+· Reset to starting position or start from a blank board <br>
+· Choose whose turn it is (Red or Black) <br>
+· Flip the board in any of 4 orientations (independent vertical AND horizontal flipping — not just a 180° rotate - with separate ↕ and ↔ flip controls giving all possible board orientation/configuration) <br>
+· No installs, no backend — runs entirely in your browser <br>
  
 Users can play the classic checkers board game directly on the webpage. The game is implemented using web technologies and includes built-in logic for valid moves and gameplay. It helps players study positions, explore strategies, and find the best possible move in a game of checkers.
