@@ -51,15 +51,27 @@ h1 em { color:#e74c3c; font-style:normal; }
 
 /* BANNER */
 #resultBanner {
-  width:100%; max-width:640px; min-height:48px;
+  width:100%; max-width:640px; min-height:52px;
   background:#252525; border:1px solid var(--border); border-radius:8px;
-  display:flex; align-items:center; flex-wrap:wrap; padding:10px 16px; gap:10px;
+  display:flex; flex-direction:column; justify-content:center;
+  padding:10px 18px; gap:5px;
   margin-bottom:16px; font-size:.9rem; color:var(--cream-dim); font-style:italic;
+  transition: border-color .2s, background .2s;
 }
-#resultBanner.active { border-color:var(--gold-dim); background:#252218; font-style:normal; color:var(--cream); }
-.bl { color:var(--cream-dim); white-space:nowrap; font-size:.82rem; }
-.bm { background:#fff; color:#111; font-weight:700; font-size:.88rem; padding:3px 10px; border-radius:4px; letter-spacing:.05em; }
-.bs { background:#222; color:#fff; font-weight:600; font-size:.88rem; padding:3px 10px; border-radius:4px; }
+#resultBanner.active    { border-color:var(--gold-dim); background:#252218; font-style:normal; color:var(--cream); }
+#resultBanner.banner-alt { border-color:#4a6a9a; background:#1c2230; }
+.banner-row { display:flex; align-items:center; flex-wrap:wrap; gap:8px; }
+.banner-sub { font-size:.78rem; color:var(--cream-dim); margin-top:1px; }
+#resultBanner.banner-alt .banner-sub { color:#7a9acc; }
+.banner-vs  { font-size:.78rem; color:#7a9acc; }
+.banner-vs strong { color:#aac4ee; }
+.banner-score-val { font-weight:700; font-size:.92rem; padding:2px 7px; border-radius:4px; }
+.best-score { background:rgba(60,180,60,.18); color:#6ee87a; border:1px solid rgba(60,180,60,.3); }
+.alt-score  { background:rgba(80,140,220,.18); color:#90bcee; border:1px solid rgba(80,140,220,.3); }
+.bl  { color:var(--cream-dim); white-space:nowrap; font-size:.82rem; }
+.bm  { background:#fff; color:#111; font-weight:700; font-size:.88rem; padding:3px 10px; border-radius:4px; letter-spacing:.05em; }
+.bm-alt { background:#2a3f5f; color:#aac4ee; border:1px solid #4a6a9a; }
+.bs  { background:#222; color:#fff; font-weight:600; font-size:.88rem; padding:3px 10px; border-radius:4px; }
 .bsc { color:var(--cream-dim); font-size:.8rem; }
 .spin-sm { width:16px;height:16px;border:2px solid var(--border);border-top-color:var(--gold);border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0; }
 @keyframes spin{to{transform:rotate(360deg)}}
@@ -198,13 +210,58 @@ h1 em { color:#e74c3c; font-style:normal; }
 .btn-row { display:flex; gap:7px; }
 .btn-row .btn { flex:1; }
 
+/* Execute Move button */
+.exec-wrap { display:flex; flex-direction:column; gap:6px; }
+.btn-exec {
+  background:#1a2e1a; color:#6ee87a; border:2px solid #2d5a2d;
+  font-size:.95rem; font-weight:700; letter-spacing:.04em;
+  opacity:.45; cursor:not-allowed; transition:all .2s;
+}
+.btn-exec:not(:disabled) { opacity:1; cursor:pointer; }
+.btn-exec.exec-ready {
+  background:linear-gradient(135deg,#1a3a1a,#2d7a2d,#1a3a1a);
+  background-size:200%; border-color:#4aaa4a; color:#afffb0;
+  box-shadow:0 3px 16px rgba(74,200,74,.3); opacity:1; cursor:pointer;
+}
+.btn-exec.exec-ready:hover {
+  background-position:right; box-shadow:0 5px 22px rgba(74,200,74,.45);
+  transform:translateY(-1px);
+}
+.btn-exec.exec-ready:active { transform:translateY(0); }
+.exec-info {
+  font-size:.78rem; color:var(--cream-dim); text-align:center;
+  line-height:1.45; min-height:18px; padding:0 2px;
+}
+.exec-info strong { color:var(--gold-light); }
+
 /* Candidates */
-.cands { display:flex; flex-direction:column; gap:4px; margin-top:4px; }
-.cand { display:flex; justify-content:space-between; align-items:center; padding:6px 9px; border-radius:4px; background:#252525; cursor:pointer; transition:background .12s; font-size:.85rem; border-left:3px solid transparent; }
-.cand:hover { background:#2e2e2e; }
-.cand.best { border-left-color:var(--gold); background:#2a2518; }
-.cand-mv { color:var(--cream); font-weight:600; }
-.cand-sc { color:var(--gold-dim); font-size:.78rem; }
+.cands { display:flex; flex-direction:column; gap:3px; margin-top:4px; }
+.cand {
+  display:flex; align-items:center; gap:8px;
+  padding:7px 10px; border-radius:5px;
+  background:#252525; cursor:pointer;
+  transition:background .12s, border-color .12s;
+  font-size:.86rem; border-left:3px solid transparent;
+  border: 1px solid transparent;
+}
+.cand:hover { background:#2e2e2e; border-color:#444; }
+.cand.best  { border-left:3px solid var(--gold); background:#2a2518; }
+.cand.selected-cand {
+  background:#1e2a1e !important;
+  border:1px solid #3a6a3a !important;
+  border-left:3px solid #4aaa4a !important;
+  box-shadow: 0 0 8px rgba(74,170,74,.15);
+}
+.cand-rank {
+  font-size:.65rem; color:var(--cream-dim); min-width:20px;
+  text-align:center; font-family:'Playfair Display',serif;
+}
+.best-rank { color:var(--gold-light); font-size:.8rem; }
+.cand-mv { color:var(--cream); font-weight:600; flex:1; }
+.cand-sc { font-size:.82rem; font-weight:600; padding:2px 6px; border-radius:3px; }
+.cand.best .cand-sc,
+.cand.selected-cand .cand-sc { background:rgba(60,180,60,.15); color:#6ee87a; }
+.cand:not(.best):not(.selected-cand) .cand-sc { color:var(--gold-dim); }
 
 /* Legend */
 .legend { font-size:.8rem; color:var(--cream-dim); display:flex; flex-direction:column; gap:5px; }
@@ -502,12 +559,14 @@ footer { margin-top:28px; font-size:.73rem; color:#555; letter-spacing:.06em; te
 ══════════════════════════════════════════════════════ */
 let board = Array.from({length:8},()=>Array(8).fill(0));
 let turn = 'red';
-let flipV = false;  // vertical flip: red moves to top
-let flipH = false;  // horizontal flip: mirror left-right
+let flipV = false;
+let flipH = false;
 let palType = 1;
 let highlights = {};
 let arrowSegs = [];
 let dragSrc = null, dragGhost = null;
+let bestMove = null;
+let nodeCount = 0;
 
 /* Helpers */
 const isRed  = v=>v===1||v===3;
@@ -899,9 +958,6 @@ function evaluate(b) {
   return s;
 }
 
-let nodeCount=0;
-let bestMove = null; // stores the last calculated best move
-
 function minimax(b,depth,alpha,beta,maxing) {
   nodeCount++;
   const color=maxing?'red':'black';
@@ -953,17 +1009,19 @@ async function doCalc() {
     // Highlight + arrows
     highlightMove(best);
 
-    // Banner
+    // Banner — structured format
     const mvStr=fmtMv(best);
     const seqStr=scored.length>1?fmtMv(scored[1]):null;
     const sc=best.score;
     const type=best.jumps.length>1?'Multi-jump capture':best.jumps.length===1?'Capture':'Quiet move';
-    let html=`<span class="bl">The best move is</span><span class="bm">${mvStr}</span>`;
-    html+=`<span class="bl">Score: ${sc>0?'+':''}${sc}</span>`;
-    if(seqStr)html+=`<span class="bl">sequence</span><span class="bs">${seqStr}</span>`;
-    html+=`<span class="bsc">${type} · ${nodeCount.toLocaleString()} nodes · depth ${depth}</span>`;
+    let html=`<div class="banner-row">`;
+    html+=`<span class="bl">Best move</span><span class="bm">${mvStr}</span>`;
+    html+=`<span class="bl">Score:</span><span class="banner-score-val best-score">${sc>0?'+':''}${sc}</span>`;
+    if(seqStr) html+=`<span class="bl">sequence</span><span class="bs">${seqStr}</span>`;
+    html+=`</div>`;
+    html+=`<div class="banner-sub">${type} · ${nodeCount.toLocaleString()} nodes · depth ${depth}</div>`;
     const banEl=document.getElementById('resultBanner');
-    banEl.innerHTML=html; banEl.classList.add('active');
+    banEl.innerHTML=html; banEl.classList.add('active'); banEl.classList.remove('banner-alt');
 
     // Enable execute button
     setExecBtn(true, mvStr, best.jumps.length);
@@ -1063,20 +1121,79 @@ async function doExecute() {
   setSt('Move executed. '+cap(nextTurn)+'\'s turn.');
 }
 
+let allScoredMoves = [];  // full scored list from last calc
+let selectedMoveIdx = 0; // which candidate is currently selected/highlighted
+
 function showCands(scored) {
-  const sec=document.getElementById('candSec');
-  const list=document.getElementById('candList');
-  sec.style.display='block'; list.innerHTML='';
-  scored.forEach((mv,i)=>{
-    const d=document.createElement('div');
-    d.className='cand'+(i===0?' best':'');
-    const s=mv.score;
-    d.innerHTML=`<span class="cand-mv">${fmtMv(mv)}</span><span class="cand-sc">${s>0?'+':''}${s}</span>`;
-    d.addEventListener('click',()=>highlightMove(mv));
+  allScoredMoves = scored;
+  selectedMoveIdx = 0;
+  const sec  = document.getElementById('candSec');
+  const list = document.getElementById('candList');
+  sec.style.display = 'block';
+  list.innerHTML = '';
+  scored.forEach((mv, i) => {
+    const d = document.createElement('div');
+    d.id = 'cand-row-' + i;
+    d.className = 'cand' + (i === 0 ? ' best selected-cand' : '');
+    const s = mv.score;
+    const rank = i === 0 ? '<span class="cand-rank best-rank">★</span>' : `<span class="cand-rank">#${i+1}</span>`;
+    d.innerHTML = `${rank}<span class="cand-mv">${fmtMv(mv)}</span><span class="cand-sc">${s > 0 ? '+' : ''}${s}</span>`;
+    d.addEventListener('click', () => selectCandidate(i));
     list.appendChild(d);
   });
 }
-function hideCands(){ document.getElementById('candSec').style.display='none'; document.getElementById('candList').innerHTML=''; }
+
+function selectCandidate(i) {
+  const mv = allScoredMoves[i];
+  if (!mv) return;
+
+  // Update visual selection in list
+  selectedMoveIdx = i;
+  document.querySelectorAll('.cand').forEach((el, j) => {
+    el.classList.toggle('selected-cand', j === i);
+  });
+
+  // Update board highlights + arrows
+  highlightMove(mv);
+
+  // Update execute button
+  setExecBtn(true, fmtMv(mv), mv.jumps.length);
+  bestMove = mv;
+
+  // Update banner to reflect selected candidate
+  const mvStr  = fmtMv(mv);
+  const sc     = mv.score;
+  const isAIBest = (i === 0);
+  const type   = mv.jumps.length > 1 ? 'Multi-jump capture' : mv.jumps.length === 1 ? 'Capture' : 'Quiet move';
+  const scBetter = turn === 'red' ? (sc >= allScoredMoves[0].score) : (sc <= allScoredMoves[0].score);
+
+  let html = '';
+  if (isAIBest) {
+    html += `<div class="banner-row"><span class="bl">Best move</span><span class="bm">${mvStr}</span><span class="bl">Score:</span><span class="banner-score-val best-score">${sc > 0 ? '+' : ''}${sc}</span></div>`;
+  } else {
+    const bestStr = fmtMv(allScoredMoves[0]);
+    const diff    = sc - allScoredMoves[0].score;
+    const diffStr = (diff > 0 ? '+' : '') + diff;
+    html += `<div class="banner-row">`;
+    html += `<span class="bl">Selected</span><span class="bm bm-alt">${mvStr}</span>`;
+    html += `<span class="bl">Score:</span><span class="banner-score-val alt-score">${sc > 0 ? '+' : ''}${sc}</span>`;
+    html += `<span class="banner-vs">vs best <strong>${bestStr}</strong> (${diffStr})</span>`;
+    html += `</div>`;
+  }
+  html += `<div class="banner-sub">${type} · Rank #${i+1} of ${allScoredMoves.length}</div>`;
+
+  const banEl = document.getElementById('resultBanner');
+  banEl.innerHTML = html;
+  banEl.classList.add('active');
+  banEl.classList.toggle('banner-alt', !isAIBest);
+}
+
+function hideCands() {
+  allScoredMoves = [];
+  selectedMoveIdx = 0;
+  document.getElementById('candSec').style.display = 'none';
+  document.getElementById('candList').innerHTML = '';
+}
 
 function fmtMv(mv){ return note(mv.from[0],mv.from[1])+(mv.jumps.length?'x':'-')+note(mv.to[0],mv.to[1]); }
 function setSt(m){ document.getElementById('statusBar').textContent=m; }
