@@ -1,5 +1,5 @@
 # Checkers Next Best Move
-An interactive, browser-based checkers analysis tool that calculates the next best possible move for any checkers position on any board orientation position using Minimax AI with Alpha-Beta Pruning. Set up any custom checkers position on any board orientation by clicking, dragging, and dropping pieces, then let the engine find the optimal move instantly. The site analyzes the position to recommend the strongest move along with the expected sequence of moves. Supports all standard American checkers rules including mandatory captures, multi-jump chains, and king promotion.
+An interactive, browser-based checkers analysis tool that calculates the next best possible move for any checkers position on any board orientation position using Minimax AI with Alpha-Beta Pruning. Set up any custom checkers position on any board orientation by clicking, dragging, and dropping pieces, then let the engine find the optimal move instantly. Supports all standard American checkers rules including mandatory captures, multi-jump chains, and king promotion.
 
 # Features: 
 · Fully configurable board editor that lets you place, remove, and drag pieces freely <br>
@@ -16,4 +16,4 @@ An interactive, browser-based checkers analysis tool that calculates the next be
 · Flip the board in any of 4 orientations (independent vertical AND horizontal flipping — not just a 180° rotate - with separate ↕ and ↔ flip controls giving all possible board orientation/configuration) <br>
 · No installs, no backend — runs entirely in your browser <br>
  
-Users can play the classic checkers board game directly on the webpage. The game is implemented using web technologies and includes built-in logic for valid moves and gameplay. It helps players study positions, explore strategies, and find the best possible move in a game of checkers.
+Users can play the classic checkers board game directly on the webpage. The site analyzes the position to recommend the strongest move along with the expected sequence of moves. The game is implemented using web technologies and includes built-in logic for valid moves and gameplay. It helps players study positions, explore strategies, and find the best possible move in a game of checkers.
