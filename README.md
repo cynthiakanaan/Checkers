@@ -2,7 +2,7 @@
 An interactive, browser-based checkers analysis tool that calculates the next best possible move for any checkers position on any board orientation position using Minimax AI with Alpha-Beta Pruning. Set up any custom checkers position on any board orientation by clicking, dragging, and dropping pieces, then let the engine find the optimal move instantly. The site analyzes the position to recommend the strongest move along with the expected sequence of moves. Supports all standard American checkers rules including mandatory captures, multi-jump chains, and king promotion.
 
 # Features: 
-· Fully configurable board editor that lets you place, remove, and drag pieces freely 
+· Fully configurable board editor that lets you place, remove, and drag pieces freely <br>
 · Best move calculated and displayed with animated visual (SVG) arrows and numbered move sequences, along with a ranked list of candidate moves with evaluation scores
 · Adjustable search depth (4–10 moves ahead)
 · Fully configurable and customizable board editor allowing you to place, erase, remove, or drag any red/black/king pieces freely
