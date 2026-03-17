@@ -1,4 +1,5 @@
 # Checkers Next Best Move
+website: https://cynthiakanaan.github.io/Checkers/
 An interactive, browser-based checkers analysis tool that calculates the next best possible move for any checkers position on any board orientation position using Minimax AI with Alpha-Beta Pruning. Set up any custom checkers position on any board orientation by clicking, dragging, and dropping pieces, then let the engine find the optimal move instantly. Supports all standard American checkers rules including mandatory captures, multi-jump chains, and king promotion.
 
 # Features: 
